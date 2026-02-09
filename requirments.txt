@@ -4,6 +4,9 @@ yfinance
 pandas
 numpy
 scikit-learn
-tensorflow
+tensorflow-cpu
 ta
 joblib
+requests
+transformers
+torch
