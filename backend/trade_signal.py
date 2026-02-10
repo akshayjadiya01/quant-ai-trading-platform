@@ -14,6 +14,7 @@ class TradeSignalRequest(BaseModel):
 
 # ---------- Core reusable function ----------
 def get_trade_signal(symbol: str, horizon: int = 1):
+    from backend.rl_inference import RLTrader
     try:
         trader = RLTrader(symbol)
         signal, confidence = trader.predict_signal()

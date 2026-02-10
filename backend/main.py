@@ -6,14 +6,10 @@ import os
 from backend.schemas import PredictionRequest, PredictionResponse
 from backend.stock_data import fetch_stock_data
 from backend.features import create_features
-from backend.model_registry import (
-    load_or_create_lstm,
-    get_model_path,
-    get_scaler_path,
-)
+
 from backend.news_fetcher import fetch_company_news
 from backend.sentiment import sentiment_score
-from backend.rl_inference import RLTrader
+
 
 # Trade signal router
 from backend.trade_signal import router as trade_signal_router
@@ -28,9 +24,14 @@ app = FastAPI(
 )
 from fastapi.middleware.cors import CORSMiddleware
 
+@app.on_event("startup")
+def startup_event():
+    print("✅ FastAPI startup complete — server is live")
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],  # or your frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -69,6 +70,11 @@ def root():
 @app.post("/predict", response_model=PredictionResponse)
 def predict_stock(req: PredictionRequest):
     try:
+        from backend.model_registry import (
+            load_or_create_lstm,
+            get_model_path,
+            get_scaler_path,
+        )
         # 1. Fetch stock data
         df = fetch_stock_data(req.symbol)
         df_feat = create_features(df)
@@ -174,11 +180,13 @@ def risk_metrics(symbol: str, window: int = 252):
 
 @app.get("/backtest/{symbol}")
 def backtest(symbol: str, capital: float = 100000):
+    from backend.model_registry import load_or_create_lstm
+
     df = fetch_stock_data(symbol)
     df_feat = create_features(df)
 
     prices = df_feat["Close"].values
-    features = df_feat[["rsi","ema_20","ema_50","volatility"]].values
+    features = df_feat[["rsi", "ema_20", "ema_50", "volatility"]].values
 
     lookback = 60
     equity = capital
@@ -190,7 +198,7 @@ def backtest(symbol: str, capital: float = 100000):
         X = features[:t]
         predicted_return = predictor.predict_return(X)
 
-        position = np.sign(predicted_return)  # simple policy
+        position = np.sign(predicted_return)
         daily_ret = (prices[t+1] - prices[t]) / prices[t]
 
         equity *= (1 + position * daily_ret)
@@ -208,7 +216,7 @@ def backtest(symbol: str, capital: float = 100000):
         "final_equity": round(float(equity), 2),
         "total_return": round((equity / capital - 1), 4),
         "sharpe": round(float(sharpe), 3),
-        "equity_curve": equity_curve[-200:]  # last 200 points
+        "equity_curve": equity_curve[-200:]
     }
 
 from backend.schemas import PortfolioRequest
