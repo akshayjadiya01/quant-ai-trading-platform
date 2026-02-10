@@ -11,8 +11,7 @@ from backend.news_fetcher import fetch_company_news
 from backend.sentiment import sentiment_score
 
 
-# Trade signal router
-from backend.trade_signal import router as trade_signal_router
+
 
 
 # -------------------------------------------------
@@ -26,7 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 @app.on_event("startup")
 def startup_event():
-    print("✅ FastAPI startup complete — server is live")
+    print("🚀 FASTAPI STARTUP COMPLETE — PORT SHOULD BE OPEN NOW")
 
 
 app.add_middleware(
@@ -38,8 +37,13 @@ app.add_middleware(
 )
 
 
-# Register trade-signal router
-app.include_router(trade_signal_router)
+
+def register_trade_signal_router(app: FastAPI):
+    from backend.trade_signal import router
+    app.include_router(router)
+
+register_trade_signal_router(app)
+
 
 # Absolute project root
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
