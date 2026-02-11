@@ -24,20 +24,37 @@ def history(symbol: str, limit: int = 60):
     try:
         df = yf.download(symbol, period="6mo")
 
-        if df.empty:
-            raise HTTPException(status_code=404, detail="No data found")
+        if df is None or df.empty:
+            return {
+                "symbol": symbol,
+                "history": []
+            }
 
         df = df.tail(limit)
 
-        data = [
-            {
-                "date": str(index.date()),
-                "price": float(row["Close"])
-            }
-            for index, row in df.iterrows()
-        ]
+        history = []
+        for index, row in df.iterrows():
+            try:
+                history.append({
+                    "date": str(index.date()),
+                    "price": float(row["Close"])
+                })
+            except:
+                continue
 
-        return {"symbol": symbol, "history": data}
+        return {
+            "symbol": symbol,
+            "history": history
+        }
 
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        print("HISTORY ERROR:", e)
+        return {
+            "symbol": symbol,
+            "history": []
+        }
+
+@app.get("/indicators/{symbol}")
+def indicators(symbol: str):
+    return {"symbol": symbol, "indicators": []}
+
