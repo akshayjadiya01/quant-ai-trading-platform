@@ -57,9 +57,10 @@ try:
     from backend.news_fetcher import fetch_company_news
     logger.info("[INIT] ✅ news_fetcher imported")
     
-    logger.info("[INIT] Importing sentiment...")
-    from backend.sentiment import sentiment_score
-    logger.info("[INIT] ✅ sentiment imported")
+    logger.info("[INIT] Deferring sentiment import until runtime")
+    # Transformers library takes time to initialize; defer to first use
+    sentiment_score = None
+    logger.info("[INIT] ✅ sentiment deferred")
     
     logger.info("[INIT] Deferring model_registry import until runtime")
     # will import load_or_create_lstm/get_model_path/get_scaler_path inside request handlers
@@ -271,11 +272,22 @@ async def predict_stock(req: PredictionRequest):
         predicted_return = predictor.predict_return(X)
         predicted_price = float(y[-1] * (1 + predicted_return))
 
-        # 4. News sentiment (safe fallback)
+        # 4. News sentiment (safe fallback, lazy import)
         sent_score = 0.0
         try:
             news = fetch_company_news(req.symbol)
             if news:
+                # Lazy import sentiment_score on first use
+                global sentiment_score
+                if sentiment_score is None:
+                    try:
+                        from backend.sentiment import sentiment_score as _sent
+                        sentiment_score = _sent
+                        logger.info("Sentiment module loaded at runtime")
+                    except Exception as e:
+                        logger.warning(f"Sentiment module unavailable: {e}")
+                        sentiment_score = lambda x: 0.0
+                
                 sent_score = sentiment_score(news)
         except Exception as e:
             logger.warning(f"Could not fetch sentiment for {req.symbol}: {e}")
