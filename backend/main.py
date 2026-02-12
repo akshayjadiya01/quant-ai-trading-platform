@@ -246,13 +246,17 @@ async def predict_stock(req: PredictionRequest):
             raise ValueError(f"Not enough historical data for {req.symbol}. Need at least {lookback} days.")
 
         # 2. Load or auto-train LSTM (import at runtime to avoid heavy top-level imports)
+        global load_or_create_lstm, get_model_path, get_scaler_path
         if load_or_create_lstm is None:
             try:
                 from backend.model_registry import (
-                    load_or_create_lstm,
-                    get_model_path,
-                    get_scaler_path,
+                    load_or_create_lstm as _load,
+                    get_model_path as _get_model_path,
+                    get_scaler_path as _get_scaler_path,
                 )
+                load_or_create_lstm = _load
+                get_model_path = _get_model_path
+                get_scaler_path = _get_scaler_path
             except Exception as e:
                 logger.error(f"Model registry unavailable: {e}")
                 raise HTTPException(status_code=503, detail="Model registry unavailable")
@@ -414,9 +418,11 @@ async def backtest(symbol: str, capital: float = 100000):
         equity_curve = []
 
         # Lazy import model_registry to avoid heavy startup imports
+        global load_or_create_lstm
         if load_or_create_lstm is None:
             try:
-                from backend.model_registry import load_or_create_lstm
+                from backend.model_registry import load_or_create_lstm as _load
+                load_or_create_lstm = _load
             except Exception as e:
                 logger.error(f"Model registry unavailable for backtest: {e}")
                 raise HTTPException(status_code=503, detail="Model registry unavailable")
