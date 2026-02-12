@@ -190,9 +190,10 @@ def check_dependencies():
 # ============================================================================
 # Health Check Endpoints
 # ============================================================================
-@app.get("/")
+@app.get("/", include_in_schema=True)
+@app.head("/", include_in_schema=False)
 async def root():
-    """Root health check endpoint"""
+    """Root health check endpoint - supports HEAD for port scanners"""
     return {
         "status": "running",
         "message": "AI Stock Prediction & Trading API is live",
@@ -210,9 +211,10 @@ async def root():
         ]
     }
 
-@app.get("/health")
+@app.get("/health", include_in_schema=True)
+@app.head("/health", include_in_schema=False)
 async def health_check():
-    """Simple health check"""
+    """Simple health check - supports HEAD for port scanners"""
     return {"status": "ok"}
 
 # ============================================================================
