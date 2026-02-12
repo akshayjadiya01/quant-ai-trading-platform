@@ -9,6 +9,7 @@ import logging
 
 # External dependencies
 import numpy as np
+import threading
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -59,9 +60,10 @@ try:
     get_model_path = None
     get_scaler_path = None
     
-    logger.info("[INIT] Importing paper_trading...")
-    from backend.paper_trading import run_paper_trading
-    logger.info("[INIT] ✅ paper_trading imported")
+    logger.info("[INIT] Deferring paper_trading import until runtime")
+    # runtime import in handler to avoid blocking module import
+    run_paper_trading = None
+    logger.info("[INIT] ✅ paper_trading deferred")
     
 except ImportError as e:
     logger.warning(f"[INIT] ⚠️ Import error (continuing anyway): {e}")
@@ -130,6 +132,13 @@ async def startup_event():
         logger.info(f"[STARTUP] ✅ Server binding to port: {port}")
         logger.info("[STARTUP] ✅ All systems ready for deployment")
         print(f"[STARTUP-SUCCESS] Server started on port {port}")
+        # Register optional routers in background to avoid blocking
+        try:
+            t = threading.Thread(target=register_trade_signal_router, args=(app,), daemon=True)
+            t.start()
+            logger.info("[STARTUP] Trade-signal router registration started in background thread")
+        except Exception as e:
+            logger.warning(f"[STARTUP] Could not start router registration thread: {e}")
     except Exception as e:
         logger.error(f"[STARTUP] ⚠️ Startup warning: {e}")
         print(f"[STARTUP-ERROR] {e}")
@@ -154,12 +163,7 @@ def register_trade_signal_router(app: FastAPI):
     except Exception as e:
         logger.warning(f"[INIT] ⚠️ Trade signal router not available: {type(e).__name__}: {e}")
 
-try:
-    register_trade_signal_router(app)
-except Exception as e:
-    logger.warning(f"[INIT] ⚠️ Could not register trade signal router: {e}")
-
-logger.info("[INIT] ✅ All routers registered (or skipped if unavailable)")
+logger.info("[INIT] Router registration deferred to startup event")
 
 # Project root
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -512,6 +516,17 @@ async def paper_trade(req: PaperTradeRequest):
     check_dependencies()
     try:
         logger.info(f"Running paper trading for {req.symbol} for {req.days} days")
+        # Lazy import to avoid heavy work during module import
+        global run_paper_trading
+        if run_paper_trading is None:
+            try:
+                from backend.paper_trading import run_paper_trading as _run_pt
+                run_paper_trading = _run_pt
+                logger.info("Paper trading module loaded at runtime")
+            except Exception as e:
+                logger.error(f"Paper trading module unavailable: {e}")
+                raise HTTPException(status_code=503, detail="Paper trading unavailable")
+
         return run_paper_trading(req.symbol, req.days)
     except Exception as e:
         logger.error(f"Paper trading error: {str(e)}")
