@@ -23,26 +23,61 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Log startup
+print(f"[INIT] Starting backend.main module initialization...")
+logger.info("[INIT] FastAPI module loading...")
+
 # Internal imports (ABSOLUTE, PACKAGE-SAFE)
 try:
+    logger.info("[INIT] Importing schemas...")
     from backend.schemas import (
         PredictionRequest,
         PredictionResponse,
         PortfolioRequest,
     )
+    logger.info("[INIT] ✅ Schemas imported")
+    
+    logger.info("[INIT] Importing stock_data...")
     from backend.stock_data import fetch_stock_data
+    logger.info("[INIT] ✅ stock_data imported")
+    
+    logger.info("[INIT] Importing features...")
     from backend.features import create_features
+    logger.info("[INIT] ✅ features imported")
+    
+    logger.info("[INIT] Importing news_fetcher...")
     from backend.news_fetcher import fetch_company_news
+    logger.info("[INIT] ✅ news_fetcher imported")
+    
+    logger.info("[INIT] Importing sentiment...")
     from backend.sentiment import sentiment_score
+    logger.info("[INIT] ✅ sentiment imported")
+    
+    logger.info("[INIT] Importing model_registry...")
     from backend.model_registry import (
         load_or_create_lstm,
         get_model_path,
         get_scaler_path,
     )
+    logger.info("[INIT] ✅ model_registry imported")
+    
+    logger.info("[INIT] Importing paper_trading...")
     from backend.paper_trading import run_paper_trading
+    logger.info("[INIT] ✅ paper_trading imported")
+    
 except ImportError as e:
-    logger.warning(f"⚠️ Import warning: {e}")
+    logger.warning(f"[INIT] ⚠️ Import error (continuing anyway): {e}")
+    print(f"[INIT-ERROR] Import error: {e}")
     # Continue execution even if some imports fail
+    fetch_stock_data = None
+    create_features = None
+    fetch_company_news = None
+    sentiment_score = None
+    run_paper_trading = None
+except Exception as e:
+    logger.error(f"[INIT] ❌ Unexpected error during imports: {type(e).__name__}: {e}")
+    print(f"[INIT-ERROR] Unexpected error: {e}")
+    # Still continue
     fetch_stock_data = None
     create_features = None
     fetch_company_news = None
@@ -52,20 +87,31 @@ except ImportError as e:
 # ============================================================================
 # FastAPI Application Setup
 # ============================================================================
-app = FastAPI(
-    title="AI Stock Prediction & Trading API",
-    version="1.0.0",
-    description="Advanced ML-powered stock prediction and portfolio optimization"
-)
+logger.info("[INIT] Creating FastAPI app...")
+try:
+    app = FastAPI(
+        title="AI Stock Prediction & Trading API",
+        version="1.0.0",
+        description="Advanced ML-powered stock prediction and portfolio optimization"
+    )
+    logger.info("[INIT] ✅ FastAPI app created successfully")
+except Exception as e:
+    logger.error(f"[INIT] ❌ Failed to create FastAPI app: {e}")
+    raise
 
 # CORS Middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+try:
+    logger.info("[INIT] Setting up CORS middleware...")
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    logger.info("[INIT] ✅ CORS middleware configured")
+except Exception as e:
+    logger.error(f"[INIT] ❌ Failed to setup CORS: {e}")
 
 # ============================================================================
 # Pydantic Models
@@ -81,11 +127,14 @@ class PaperTradeRequest(BaseModel):
 async def startup_event():
     """Initialize app on startup"""
     try:
-        logger.info("🚀 FastAPI application starting up...")
-        logger.info(f"✅ Server binding to port: {os.getenv('PORT', 8000)}")
-        logger.info("✅ All systems ready for deployment")
+        logger.info("[STARTUP] 🚀 FastAPI application starting up...")
+        port = os.getenv('PORT', 8000)
+        logger.info(f"[STARTUP] ✅ Server binding to port: {port}")
+        logger.info("[STARTUP] ✅ All systems ready for deployment")
+        print(f"[STARTUP-SUCCESS] Server started on port {port}")
     except Exception as e:
-        logger.error(f"Startup warning: {e}")
+        logger.error(f"[STARTUP] ⚠️ Startup warning: {e}")
+        print(f"[STARTUP-ERROR] {e}")
         # Continue anyway - app must start
 
 @app.on_event("shutdown")
@@ -96,16 +145,23 @@ async def shutdown_event():
 # ============================================================================
 # Router Registration
 # ============================================================================
+logger.info("[INIT] Registering routers...")
 def register_trade_signal_router(app: FastAPI):
     """Register trade signal router if available"""
     try:
+        logger.info("[INIT] Attempting to import trade_signal router...")
         from backend.trade_signal import router
         app.include_router(router)
-        logger.info("✅ Trade signal router registered")
-    except ImportError as e:
-        logger.warning(f"⚠️ Trade signal router not available: {e}")
+        logger.info("[INIT] ✅ Trade signal router registered")
+    except Exception as e:
+        logger.warning(f"[INIT] ⚠️ Trade signal router not available: {type(e).__name__}: {e}")
 
-register_trade_signal_router(app)
+try:
+    register_trade_signal_router(app)
+except Exception as e:
+    logger.warning(f"[INIT] ⚠️ Could not register trade signal router: {e}")
+
+logger.info("[INIT] ✅ All routers registered (or skipped if unavailable)")
 
 # Project root
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -521,6 +577,9 @@ async def get_technical_indicators(symbol: str, limit: int = 100):
 # ============================================================================
 # Main Entry Point
 # ============================================================================
+logger.info("[INIT] ✅ Module initialization COMPLETE - App is ready!")
+print("[MODULE-READY] backend.main module fully initialized")
+
 if __name__ == "__main__":
     import uvicorn
     
@@ -528,7 +587,8 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     host = os.getenv("HOST", "0.0.0.0")
     
-    logger.info(f"🚀 Starting server on {host}:{port}")
+    logger.info(f"[MAIN] 🚀 Starting server on {host}:{port}")
+    print(f"[MAIN] Starting uvicorn server...")
     
     uvicorn.run(
         app,
