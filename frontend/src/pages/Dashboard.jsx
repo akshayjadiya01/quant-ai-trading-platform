@@ -1,6 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import CommandPalette from "../components/CommandPalette.jsx";
+import MarketTape from "../components/MarketTape.jsx";
+import OrderBook from "../components/OrderBook.jsx";
+import "../styles/terminal.css";
 import {
   LineChart,
   Line,
@@ -40,6 +43,7 @@ export default function Dashboard() {
   const [showCommandPalette, setShowCommandPalette] = useState(false);
   const [commandQuery, setCommandQuery] = useState("");
   const commandRef = useRef(null);
+  const [terminalMode, setTerminalMode] = useState(false);
 
   /* ---------------- API CALLS ---------------- */
 
@@ -246,7 +250,7 @@ export default function Dashboard() {
   /* ---------------- UI ---------------- */
 
   return (
-    <div className={`page theme-${theme}`} style={{
+    <div className={`page theme-${theme} ${terminalMode ? "terminal-mode" : ""}`} style={{
       backgroundColor: theme === "dark" ? "#0b0f14" : "#f5f5f5",
       color: theme === "dark" ? "#e5e7eb" : "#1f2937"
     }}>
@@ -290,6 +294,13 @@ export default function Dashboard() {
               title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
             >
               {theme === "dark" ? "☀️" : "🌙"}
+            </button>
+            <button
+              className={`terminal-toggle ${terminalMode ? 'active' : ''}`}
+              onClick={() => setTerminalMode(t => !t)}
+              title="Toggle Terminal Mode"
+            >
+              🖥️
             </button>
           </div>
         </header>
@@ -407,7 +418,9 @@ export default function Dashboard() {
         {error && <div className="error">❌ {error}</div>}
 
         {/* TOP CARDS */}
-        <section className="grid">
+        <div className={terminalMode ? "terminal-layout" : ""}>
+          <div className="terminal-left">
+            <section className="grid">
           <div className="card">
             <div className="card-header">
               <h3>🔮 Prediction</h3>
@@ -455,7 +468,15 @@ export default function Dashboard() {
               <span className="muted">Generate signal for trading insights</span>
             )}
           </div>
-        </section>
+            </section>
+          </div>
+
+          {terminalMode && (
+            <aside className="terminal-right">
+              <OrderBook symbol={symbol} price={getCurrentPrice()} />
+            </aside>
+          )}
+        </div>
 
         {/* PRICE HISTORY */}
         <div className="card chart">
@@ -825,6 +846,11 @@ export default function Dashboard() {
           </>
         )}
       </div>
+
+      {/* MARKET TAPE */}
+      {terminalMode && (
+        <MarketTape symbol={symbol} price={getCurrentPrice()} />
+      )}
 
       {/* STYLES */}
       <style>{`
