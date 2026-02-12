@@ -14,23 +14,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from scipy.optimize import minimize
 
-# Internal imports (ABSOLUTE, PACKAGE-SAFE)
-from backend.schemas import (
-    PredictionRequest,
-    PredictionResponse,
-    PortfolioRequest,
-)
-from backend.stock_data import fetch_stock_data
-from backend.features import create_features
-from backend.news_fetcher import fetch_company_news
-from backend.sentiment import sentiment_score
-from backend.model_registry import (
-    load_or_create_lstm,
-    get_model_path,
-    get_scaler_path,
-)
-from backend.paper_trading import run_paper_trading
-
 # ============================================================================
 # Logging Configuration
 # ============================================================================
@@ -39,6 +22,32 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+# Internal imports (ABSOLUTE, PACKAGE-SAFE)
+try:
+    from backend.schemas import (
+        PredictionRequest,
+        PredictionResponse,
+        PortfolioRequest,
+    )
+    from backend.stock_data import fetch_stock_data
+    from backend.features import create_features
+    from backend.news_fetcher import fetch_company_news
+    from backend.sentiment import sentiment_score
+    from backend.model_registry import (
+        load_or_create_lstm,
+        get_model_path,
+        get_scaler_path,
+    )
+    from backend.paper_trading import run_paper_trading
+except ImportError as e:
+    logger.warning(f"⚠️ Import warning: {e}")
+    # Continue execution even if some imports fail
+    fetch_stock_data = None
+    create_features = None
+    fetch_company_news = None
+    sentiment_score = None
+    run_paper_trading = None
 
 # ============================================================================
 # FastAPI Application Setup
@@ -71,8 +80,13 @@ class PaperTradeRequest(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     """Initialize app on startup"""
-    logger.info("🚀 FastAPI application starting up...")
-    logger.info("✅ All systems ready for deployment")
+    try:
+        logger.info("🚀 FastAPI application starting up...")
+        logger.info(f"✅ Server binding to port: {os.getenv('PORT', 8000)}")
+        logger.info("✅ All systems ready for deployment")
+    except Exception as e:
+        logger.error(f"Startup warning: {e}")
+        # Continue anyway - app must start
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -96,6 +110,17 @@ register_trade_signal_router(app)
 # Project root
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RL_TRADERS = {}  # Cache RL agents for performance
+
+# ============================================================================
+# Dependency Check Helper
+# ============================================================================
+def check_dependencies():
+    """Check if critical dependencies are available"""
+    if fetch_stock_data is None or create_features is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Required stock analysis dependencies not available. Service initializing..."
+        )
 
 # ============================================================================
 # Health Check Endpoints
@@ -133,6 +158,7 @@ async def predict_stock(req: PredictionRequest):
     """
     Predict next stock price using LSTM + News Sentiment
     """
+    check_dependencies()
     try:
         logger.info(f"Predicting stock: {req.symbol}")
         
@@ -205,6 +231,7 @@ async def predict_stock(req: PredictionRequest):
 @app.get("/history/{symbol}")
 async def get_price_history(symbol: str, limit: int = 60):
     """Get historical price data for a stock"""
+    check_dependencies()
     try:
         logger.info(f"Fetching history for {symbol}")
         df = fetch_stock_data(symbol, period="6mo")
@@ -233,6 +260,7 @@ async def risk_metrics(symbol: str, window: int = 252):
     """
     Returns Volatility, Max Drawdown, and VaR (95%)
     """
+    check_dependencies()
     try:
         logger.info(f"Calculating risk metrics for {symbol}")
         df = fetch_stock_data(symbol)
@@ -278,6 +306,7 @@ async def backtest(symbol: str, capital: float = 100000):
     """
     Backtest trading strategy on historical data
     """
+    check_dependencies()
     try:
         logger.info(f"Running backtest for {symbol}")
         
@@ -334,6 +363,7 @@ async def optimize_portfolio(req: PortfolioRequest):
     """
     Optimize portfolio weights using Markowitz mean-variance optimization
     """
+    check_dependencies()
     try:
         symbols = req.symbols
         lookback = req.lookback
@@ -406,6 +436,7 @@ async def paper_trade(req: PaperTradeRequest):
     """
     Run paper trading simulation for a stock
     """
+    check_dependencies()
     try:
         logger.info(f"Running paper trading for {req.symbol} for {req.days} days")
         return run_paper_trading(req.symbol, req.days)
@@ -425,6 +456,7 @@ async def get_technical_indicators(symbol: str, limit: int = 100):
     - Bollinger Bands
     - Volume Analysis
     """
+    check_dependencies()
     try:
         logger.info(f"Fetching technical indicators for {symbol}")
         
