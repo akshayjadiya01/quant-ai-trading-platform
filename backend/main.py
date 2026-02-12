@@ -53,13 +53,11 @@ try:
     from backend.sentiment import sentiment_score
     logger.info("[INIT] ✅ sentiment imported")
     
-    logger.info("[INIT] Importing model_registry...")
-    from backend.model_registry import (
-        load_or_create_lstm,
-        get_model_path,
-        get_scaler_path,
-    )
-    logger.info("[INIT] ✅ model_registry imported")
+    logger.info("[INIT] Deferring model_registry import until runtime")
+    # will import load_or_create_lstm/get_model_path/get_scaler_path inside request handlers
+    load_or_create_lstm = None
+    get_model_path = None
+    get_scaler_path = None
     
     logger.info("[INIT] Importing paper_trading...")
     from backend.paper_trading import run_paper_trading
@@ -233,7 +231,18 @@ async def predict_stock(req: PredictionRequest):
         if len(X) <= lookback:
             raise ValueError(f"Not enough historical data for {req.symbol}. Need at least {lookback} days.")
 
-        # 2. Load or auto-train LSTM
+        # 2. Load or auto-train LSTM (import at runtime to avoid heavy top-level imports)
+        if load_or_create_lstm is None:
+            try:
+                from backend.model_registry import (
+                    load_or_create_lstm,
+                    get_model_path,
+                    get_scaler_path,
+                )
+            except Exception as e:
+                logger.error(f"Model registry unavailable: {e}")
+                raise HTTPException(status_code=503, detail="Model registry unavailable")
+
         predictor, needs_training = load_or_create_lstm(req.symbol)
 
         if needs_training:
@@ -378,6 +387,14 @@ async def backtest(symbol: str, capital: float = 100000):
         lookback = 60
         equity = capital
         equity_curve = []
+
+        # Lazy import model_registry to avoid heavy startup imports
+        if load_or_create_lstm is None:
+            try:
+                from backend.model_registry import load_or_create_lstm
+            except Exception as e:
+                logger.error(f"Model registry unavailable for backtest: {e}")
+                raise HTTPException(status_code=503, detail="Model registry unavailable")
 
         predictor, _ = load_or_create_lstm(symbol)
 
