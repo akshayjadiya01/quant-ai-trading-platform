@@ -4,6 +4,13 @@
 
 import os
 import sys
+# Reduce TensorFlow/BLAS thread usage to lower memory/CPU pressure when models load
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "2")
+os.environ.setdefault("OMP_NUM_THREADS", "1")
+os.environ.setdefault("MKL_NUM_THREADS", "1")
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
+os.environ.setdefault("VECLIB_MAXIMUM_THREADS", "1")
+os.environ.setdefault("NUMEXPR_NUM_THREADS", "1")
 from typing import List, Dict, Any, Optional
 import logging
 
