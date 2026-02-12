@@ -1,0 +1,53 @@
+.cp-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 7, 18, 0.6);
+  z-index: 9999;
+}
+
+.cp-window {
+  width: min(720px, 92%);
+  background: linear-gradient(180deg, rgba(10, 14, 22, 0.96), rgba(20, 24, 34, 0.96));
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: var(--shadow-xl);
+}
+
+.cp-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: rgba(0,0,0,0.25);
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.cp-list {
+  max-height: 260px;
+  overflow: auto;
+}
+
+.cp-item {
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.cp-item.active {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.14), rgba(16, 185, 129, 0.06));
+  color: var(--text-primary);
+}
+
+.cp-item.empty {
+  color: var(--text-muted);
+  padding: 12px;
+}

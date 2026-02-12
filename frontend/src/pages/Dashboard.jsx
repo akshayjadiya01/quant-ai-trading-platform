@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import CommandPalette from "../components/CommandPalette.jsx";
 import {
   LineChart,
   Line,
@@ -36,6 +37,9 @@ export default function Dashboard() {
   const [showSettings, setShowSettings] = useState(false);
   const [indicators, setIndicators] = useState([]);
   const [showAdvancedCharts, setShowAdvancedCharts] = useState(true);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const [commandQuery, setCommandQuery] = useState("");
+  const commandRef = useRef(null);
 
   /* ---------------- API CALLS ---------------- */
 
@@ -141,7 +145,42 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [autoRefresh, refreshInterval, prediction]);
 
+  // Keyboard shortcut: Ctrl/Cmd+K opens command palette
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setShowCommandPalette((v) => !v);
+      } else if (e.key === "Escape") {
+        setShowCommandPalette(false);
+      }
+    };
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   /* ----------- HELPER FUNCTIONS ----------- */
+
+  const executeCommand = (cmd) => {
+    if (!cmd) return;
+    try {
+      if (cmd.startsWith("go:")) {
+        const s = cmd.split(":")[1].toUpperCase();
+        setSymbol(s);
+        // allow state to update then fetch
+        setTimeout(() => { fetchHistory(); runPrediction(); }, 120);
+      } else if (cmd === "toggleCharts") {
+        setShowAdvancedCharts((v) => !v);
+      } else if (cmd === "toggleTheme") {
+        setTheme((t) => (t === "dark" ? "light" : "dark"));
+      } else if (cmd === "refresh") {
+        fetchHistory(); fetchIndicators(); runPrediction();
+      }
+    } finally {
+      setShowCommandPalette(false);
+    }
+  };
 
   const getFilteredHistory = () => {
     if (!history.length) return [];
@@ -256,6 +295,13 @@ export default function Dashboard() {
         </header>
 
         {/* SETTINGS PANEL */}
+        {showCommandPalette && (
+          <CommandPalette
+            onClose={() => setShowCommandPalette(false)}
+            onExecute={(cmd) => executeCommand(cmd)}
+            initialQuery={commandQuery}
+          />
+        )}
         {showSettings && (
           <div className="settings-panel">
             <div className="settings-content">
