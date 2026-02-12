@@ -1,0 +1,58 @@
+/* RiskCard Component Styles */
+
+.risk-card {
+  background: linear-gradient(135deg, rgba(26, 34, 53, 0.8) 0%, rgba(35, 45, 66, 0.5) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-lg);
+  transition: all var(--transition-normal);
+  backdrop-filter: blur(8px);
+}
+
+.risk-card:hover {
+  background: linear-gradient(135deg, rgba(35, 45, 66, 0.9) 0%, rgba(45, 55, 75, 0.6) 100%);
+  border-color: var(--accent-red);
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(239, 68, 68, 0.1);
+  transform: translateY(-2px);
+}
+
+.risk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--sp-lg);
+}
+
+.risk-item {
+  padding: var(--sp-md);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.risk-label {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--sp-sm);
+  font-weight: 600;
+}
+
+.risk-value {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.risk-badge {
+  margin-top: var(--sp-sm);
+  font-size: var(--font-size-xs);
+  padding: var(--sp-xs) var(--sp-md);
+  border-radius: var(--radius-lg);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--accent-red-light);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  display: inline-block;
+  font-weight: 600;
+}
