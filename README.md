@@ -47,13 +47,10 @@ Deployed on **Render** with a production-ready backend and responsive React fron
 <img width="1550" height="841" alt="image" src="https://github.com/user-attachments/assets/cace332c-b21f-45bd-ae6a-ceda41f966b9" />
 
 ### Price Prediction & Technical Indicators
-![Price Charts with Indicators](https://via.placeholder.com/1200x500/0b0f14/3b82f6?text=LSTM+Price+Prediction+%26+Technical+Indicators)
+<img width="1827" height="367" alt="image" src="https://github.com/user-attachments/assets/0c333c72-3675-4d09-949f-907ca9d6d059" />
 
 ### Portfolio Risk Analytics
-![Risk Analytics](https://via.placeholder.com/1200x500/0b0f14/ec4899?text=Risk+Metrics+%26+Equity+Curve)
-
-### Terminal Mode (Bloomberg-Style)
-![Terminal UI](https://via.placeholder.com/1200x400/0b0f14/f59e0b?text=Terminal+Mode+with+Market+Tape+%26+Order+Book)
+<img width="1594" height="848" alt="image" src="https://github.com/user-attachments/assets/6d30bf77-3d72-41ba-aa9a-4a3d1990aef6" />
 
 ---
 
