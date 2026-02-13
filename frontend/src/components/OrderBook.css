@@ -1,24 +1,106 @@
-.orderbook{
-  width:320px;
-  border-left:1px solid rgba(255,255,255,0.03);
-  padding:12px;
-  background: rgba(2,6,23,0.6);
-  border-radius:8px;
+.orderbook {
+  width: 360px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 16px;
+  background: linear-gradient(
+    135deg,
+    rgba(2, 6, 23, 0.95),
+    rgba(15, 23, 42, 0.9)
+  );
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  font-family: 'Monaco', 'Courier New', monospace;
 }
-.orderbook-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:8px;
+
+.orderbook-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
-.orderbook-grid{
-  display:flex;
-  gap:8px;
+
+.orderbook-header strong {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #f8fafc;
 }
-.col-header{ font-size:12px; opacity:0.7; margin-bottom:6px }
-.row{ display:flex; justify-content:space-between; padding:6px 8px; border-radius:6px; margin-bottom:6px }
-.row.bid{ background: rgba(34,197,94,0.06); }
-.row.ask{ background: rgba(239,68,68,0.04); }
-.price{ font-weight:700 }
-.size.muted{ opacity:0.7 }
-.mid-price{ font-weight:700; color:#f8fafc }
+
+.mid-price {
+  font-weight: 700;
+  color: #22c55e;
+  font-size: 15px;
+  background: rgba(34, 197, 94, 0.08);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.orderbook-grid {
+  display: flex;
+  gap: 12px;
+}
+
+.orderbook-grid > div {
+  flex: 1;
+}
+
+.col-header {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.row.bid {
+  background: rgba(34, 197, 94, 0.08);
+}
+
+.row.bid:hover {
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.row.ask {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.row.ask:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.price {
+  font-weight: 700;
+  color: #f8fafc;
+}
+
+.row.bid .price {
+  color: #10b981;
+}
+
+.row.ask .price {
+  color: #ef4444;
+}
+
+.size {
+  opacity: 0.7;
+  text-align: right;
+}

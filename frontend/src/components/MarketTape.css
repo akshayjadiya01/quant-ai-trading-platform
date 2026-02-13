@@ -1,32 +1,77 @@
-.market-tape{
-  width:100%;
-  overflow:hidden;
-  border-top:1px solid rgba(255,255,255,0.03);
-  border-bottom:1px solid rgba(255,255,255,0.03);
-  background: linear-gradient(90deg, rgba(2,6,23,0.8), rgba(2,6,23,0.65));
-  padding:8px 0;
+.market-tape {
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: linear-gradient(
+    90deg,
+    rgba(2, 6, 23, 0.95),
+    rgba(15, 23, 42, 0.92),
+    rgba(2, 6, 23, 0.95)
+  );
+  padding: 12px 0;
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
-.tape-inner{
-  display:flex;
-  gap:28px;
-  align-items:center;
-  white-space:nowrap;
-  animation: tapeScroll 18s linear infinite;
+
+.tape-inner {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  white-space: nowrap;
+  animation: tapeScroll 25s linear infinite;
+  padding: 0 16px;
 }
-.tape-item{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  padding:4px 8px;
-  border-radius:6px;
-  font-size:13px;
-  color:#cbd5e1;
+
+.tape-item {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #cbd5e1;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
 }
-.tape-item.positive .tape-change{ color:#22c55e }
-.tape-item.negative .tape-change{ color:#ef4444 }
-.tape-symbol{ font-weight:700; color:#f8fafc }
-.tape-price{ min-width:80px }
-@keyframes tapeScroll{
-  from{ transform: translateX(0) }
-  to{ transform: translateX(-50%) }
+
+.tape-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: #f8fafc;
+  transform: scale(1.02);
+}
+
+.tape-item.positive .tape-change {
+  color: #10b981;
+}
+
+.tape-item.negative .tape-change {
+  color: #ef4444;
+}
+
+.tape-symbol {
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: 0.5px;
+  min-width: 45px;
+}
+
+.tape-price {
+  min-width: 90px;
+  font-weight: 600;
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.tape-change {
+  font-weight: 600;
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+@keyframes tapeScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
