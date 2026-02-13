@@ -506,8 +506,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Akshay Jadiya**
 - GitHub: [@akshayjadiya01](https://github.com/akshayjadiya01)
-- LinkedIn: [Akshay Jadiya](https://linkedin.com/in/akshay-jadiya)
-- Email: akshayjadiya01@gmail.com
+- LinkedIn: [Akshay Jadiya](www.linkedin.com/in/akshay-jadiya-88b663259/)
+- Email: akshayjadiya15@gmail.com
 - Portfolio: [https://akshayjadiya.dev](https://akshayjadiya.dev)
 
 ---
