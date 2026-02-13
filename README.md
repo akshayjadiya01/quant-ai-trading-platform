@@ -502,7 +502,7 @@ git push origin feature/your-feature-name
 - GitHub: [@akshayjadiya01](https://github.com/akshayjadiya01)
 - LinkedIn: [Akshay Jadiya](www.linkedin.com/in/akshay-jadiya-88b663259/)
 - Email: akshayjadiya15@gmail.com
-- Portfolio: [https://akshayjadiya.dev](https://akshayjadiya.dev)
+- Portfolio: [https://akshayjadiya.dev](https://akshayjadiya01.github.io/portfolio/)
 
 ---
 
