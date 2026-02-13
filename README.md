@@ -36,8 +36,11 @@ Deployed on **Render** with a production-ready backend and responsive React fron
 ## 🚀 Live Demo
 
 **Frontend:** [https://quant-ai-trading.onrender.com](https://quant-ai-trading-platform.vercel.app)
+
 **Backend API:** [https://quant-ai-backend.onrender.com](https://quant-ai-backend.onrender.com)
+
 **API Docs:** [https://quant-ai-backend.onrender.com/docs](https://quant-ai-backend.onrender.com/docs)
+
 ---
 
 ## 📸 Screenshots
