@@ -44,7 +44,8 @@ Deployed on **Render** with a production-ready backend and responsive React fron
 ## 📸 Screenshots
 
 ### Dashboard Overview
-![Dashboard Dark Mode](https://via.placeholder.com/1200x600/0b0f14/22c55e?text=Quant+AI+Trading+Dashboard)
+![Dashboard Dark Mode]<img width="1811" height="878" alt="image" src="https://github.com/user-attachments/assets/9adbab31-1555-4898-abe2-27163fe09c6a" />.
+
 
 ### Price Prediction & Technical Indicators
 ![Price Charts with Indicators](https://via.placeholder.com/1200x500/0b0f14/3b82f6?text=LSTM+Price+Prediction+%26+Technical+Indicators)
