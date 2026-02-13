@@ -44,8 +44,7 @@ Deployed on **Render** with a production-ready backend and responsive React fron
 ## 📸 Screenshots
 
 ### Dashboard Overview
-![Dashboard Dark Mode]<img width="1811" height="878" alt="image" src="https://github.com/user-attachments/assets/9adbab31-1555-4898-abe2-27163fe09c6a" />.
-
+<img width="1550" height="841" alt="image" src="https://github.com/user-attachments/assets/cace332c-b21f-45bd-ae6a-ceda41f966b9" />
 
 ### Price Prediction & Technical Indicators
 ![Price Charts with Indicators](https://via.placeholder.com/1200x500/0b0f14/3b82f6?text=LSTM+Price+Prediction+%26+Technical+Indicators)
